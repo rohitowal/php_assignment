@@ -1,40 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
 
-<?php include('dbconfig.php'); ?>
-    
-<?php include('dbconfig.php'); ?>
+<?php
 
-<?php 
-$query = "SELECT * FROM `product`";
-$result = mysqli_query($connection, $query);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-if (!$result) {
-    die("Query failed");
-} else {
-    echo "<table>";
-    echo "<tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th></tr>";
-    
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['name']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['description']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['price']) . "</td>";
-        echo "</tr>";
+
+session_start();
+
+include_once(__DIR__ . '/config/dbconfig.php'); 
+include_once(__DIR__ . '/controllers/CurrencyController.php');
+include_once(__DIR__ . '/controllers/CartController.php');
+include_once(__DIR__ . '/controllers/OrderController.php');
+
+// Handle POST requests first
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_GET['action'] ?? null;
+
+    switch ($action) {
+        case 'add_to_cart':
+            CartController::addToCart($connection);
+            break;
+        case 'confirm_order':
+            OrderController::confirmOrder($connection);
+            break;
+        default:
+            CurrencyController::handleProductPage();
+            break;
     }
+} else {
+    // GET requests
+    $action = $_GET['action'] ?? null;
 
-    echo "</table>";
+    switch ($action) {
+        default:
+            CurrencyController::handleProductPage();
+            break;
+    }
 }
 ?>
 
-
-
-</body>
-</html>

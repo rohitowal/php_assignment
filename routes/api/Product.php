@@ -1,4 +1,4 @@
-
+ 
     <?php
         parse_str($_SERVER['QUERY_STRING'], $_GET);
         include_once(__DIR__ . '/../controllers/ProductController.php');
@@ -23,5 +23,4 @@
             default:
                 echo json_encode(["error" => "Invalid request method"]);
         }
-    ?>
-
+    ?> 
