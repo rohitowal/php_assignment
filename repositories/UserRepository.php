@@ -1,5 +1,9 @@
 <?php
 
+namespace Repositories;
+
+use Models\User;
+
 class UserRepository {
     private $connection;
 

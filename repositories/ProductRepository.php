@@ -1,5 +1,9 @@
 <?php
+namespace Repositories;
+
 include_once(__DIR__ . '/../config/dbconfig.php');
+
+use Models\Product;
 
 class ProductRepository {
     private $connection;

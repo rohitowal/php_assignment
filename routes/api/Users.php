@@ -1,7 +1,8 @@
 
     <?php
         parse_str($_SERVER['QUERY_STRING'], $_GET);
-        include_once(__DIR__ . '/../controllers/UserController.php');
+        
+        use Controllers\UserController;
 
         $method = $_SERVER['REQUEST_METHOD'];
 

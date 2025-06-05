@@ -1,4 +1,11 @@
 <?php
+
+namespace Repositories;
+
+
+use Models\OrderItem;
+use Models\Order;
+
 class OrderRepository {
     private $connection;
 
@@ -7,9 +14,9 @@ class OrderRepository {
     }
 
     public function saveOrder(Order $order) {
-        $query = "INSERT INTO orders (user_id, order_date) VALUES (?, ?)";
+        $query = "INSERT INTO orders (user_id, order_date,total_amount) VALUES (?, ?,?)";
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("is", $order->userId, $order->orderDate);
+        $stmt->bind_param("isd", $order->userId, $order->orderDate,$order->totalAmount);
         $stmt->execute();
         $orderId = $stmt->insert_id;
         $stmt->close();

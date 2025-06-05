@@ -1,4 +1,6 @@
 <?php
+namespace Models;
+
 class OrderItem {
     public $id;
     public $orderId;

@@ -1,7 +1,9 @@
  
     <?php
+
+    
         parse_str($_SERVER['QUERY_STRING'], $_GET);
-        include_once(__DIR__ . '/../controllers/ProductController.php');
+        use Controllers\ProductController;
 
         $method = $_SERVER['REQUEST_METHOD'];
 

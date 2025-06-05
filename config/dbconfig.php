@@ -1,5 +1,6 @@
 <?php
 
+namespace Config;
 
 define("HOSTNAME","localhost");
 define("USERNAME","root");
