@@ -11,6 +11,13 @@ use Utils\Logger;
  */
 class OrderController {
 
+    private OrderService $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     /**
      * Handle the order confirmation logic 
      * 
@@ -18,7 +25,7 @@ class OrderController {
      * 
      * @return void
      */
-    public static function confirmOrder($connection) {
+    public function confirmOrder($connection) {
         Logger::info("OrderController::confirmOrder() called");
 
         // Detect if API client expects JSON
@@ -38,7 +45,8 @@ class OrderController {
             if (!empty($cart)) {
                 Logger::info("Cart is not empty. Proceeding to create order.");
                 try {
-                    $orderData = OrderService::createOrder($connection, $userId, $cart);
+                   // $orderData = OrderService::createOrder($connection, $userId, $cart);
+                    $orderData = $this->orderService->createOrder($connection,$userId, $cart);
                     Logger::info("Order created successfully for user ID: {$userId}");
 
                     // Clear session

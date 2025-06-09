@@ -13,6 +13,15 @@ use Models\OrderItem;
  * Manages the creation and processing of orders and their items.
  */
 class OrderService {
+
+
+    private OrderRepository $orderRepo;
+
+    public function __construct(OrderRepository $orderRepo)
+    {
+        $this->orderRepo = $orderRepo;
+    }
+
     /**
      * Creates a new order with items from the shopping cart
      * 
@@ -27,9 +36,8 @@ class OrderService {
      * 
      * @return int The ID of the newly created order
      */
-    public static function createOrder($connection, $userId, $cart) {
-        $orderRepo = new OrderRepository($connection);
-
+    public function createOrder($connection, $userId, $cart) {
+       
         //calculate total amount
         $totalAmount = 0;
         foreach ($cart as $item) {
@@ -37,7 +45,7 @@ class OrderService {
         }
         // Create main order record
         $order = new Order(null, $userId, date('Y-m-d H:i:s'),$totalAmount);
-        $orderId = $orderRepo->saveOrder($order);
+        $orderId = $this->orderRepo->saveOrder($order);
 
         // Process each cart item into order items
         foreach ($cart as $productId => $item) {
@@ -49,7 +57,7 @@ class OrderService {
                 $item['quantity'],
                 $item['price']
             );
-            $orderRepo->saveOrderItem($orderItem);
+            $this->orderRepo->saveOrderItem($orderItem);
         }
 
         return $orderItem;

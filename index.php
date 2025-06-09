@@ -1,64 +1,74 @@
-
-
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
 spl_autoload_unregister('activerecord_autoload');
 
-// Set timezone for consistent timestamps
-date_default_timezone_set('Asia/Kolkata');  
-
-// Enable error reporting for debugging
+date_default_timezone_set('Asia/Kolkata');
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Initialize session
 session_start();
 
+// Import classes
 use Utils\Logger;
 use Controllers\OrderController;
 use Controllers\CurrencyController;
 use Controllers\CartController;
-// Include required dependencies
-include_once(__DIR__ . '/utils/Logger.php'); 
-Logger::init('Cart-Assignments');                   
 
-include_once(__DIR__ . '/config/dbconfig.php'); 
+use Repositories\OrderRepository;
+use Repositories\ProductRepository;
 
-// Log request method for debugging
-Logger::debug('Request Method: ' . $_SERVER['REQUEST_METHOD']);
+use Services\OrderService;
+use Services\CartService;
+use Services\CurrencyService;
+use Services\CurrencyProcessor;
 
-// Handle POST requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_GET['action'] ?? null;
-    Logger::debug("Handling POST action: " . ($action ?? 'none'));
+// Init Logger & DB
+include_once(__DIR__ . '/utils/Logger.php');
+Logger::init('Cart-Assignments');
+include_once(__DIR__ . '/config/dbconfig.php');
 
-    // Route POST requests to appropriate controllers
-    switch ($action) {
-        case 'add_to_cart':
-            Logger::info("Action: add_to_cart");
-            CartController::addToCart($connection);
-            break;
-        case 'confirm_order':
-            Logger::info("Action: confirm_order");
-            OrderController::confirmOrder($connection);
-            break;
-        default:
-            Logger::debug("Unknown POST action, loading product page");
-            CurrencyController::handleProductPage();
-            break;
-    }
-} else {
-    // Handle GET requests
-    $action = $_GET['action'] ?? null;
-    Logger::debug("Handling GET action: " . ($action ?? 'default'));
+// Initialize shared dependencies
+$productRepo = new ProductRepository($connection);
+$currencyService = new CurrencyService();
+$currencyProcessor = new CurrencyProcessor($productRepo, $currencyService);
+$currencyController = new CurrencyController($currencyProcessor, $currencyService);
+$cartService = new CartService();
+$cartController = new CartController($productRepo, $cartService);
 
-    // Route GET requests (currently only default product page)
-    switch ($action) {
-        default:
-            CurrencyController::handleProductPage();
-            break;
-    }
+// Get clean path
+$uri = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+
+Logger::debug("Request Method: " . $_SERVER['REQUEST_METHOD']);
+Logger::debug("Path: $uri");
+
+switch ($_SERVER['REQUEST_METHOD']) {
+    case 'POST':
+        switch ($uri) {
+            case 'add-to-cart':
+                Logger::info("Route: /add-to-cart");
+                $cartController->addToCart();
+                break;
+
+            case 'confirm-order':
+                Logger::info("Route: /confirm-order");
+                $orderRepo = new OrderRepository($connection);
+                $orderService = new OrderService($orderRepo);
+                $orderController = new OrderController($orderService);
+                $orderController->confirmOrder($connection);
+                break;
+
+            default:
+                Logger::info("Route: /products");
+                $currencyController->handleProductPage();
+                break;
+        }
+        break;
+
+    case 'GET':
+    default:
+        Logger::info("Route: /products");
+        $currencyController->handleProductPage();
+        break;
 }
-?>

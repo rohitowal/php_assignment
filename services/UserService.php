@@ -11,15 +11,22 @@ use Config\dbconfig;
  * Provides an abstraction between controllers and data access layer.
  */
 class UserService {
+
+    private UserRepository $userRepo;
+
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
+    }
+    
     /**
      * Retrieve all users from the database
      * 
      * @return array List of all users
      */
-    public static function getAll() {
+    public function getAll() {
         global $connection;
-        $repo = new UserRepository($connection);
-        return $repo->getAllUsers();
+        return $this->userRepo->getAllUsers();
     }
 
     /**
@@ -30,11 +37,10 @@ class UserService {
      *                    - country: User's country
      * @return array Response message indicating success
      */
-    public static function create($data) {
+    public function create($data) {
         global $connection;
         $user = new User(null, $data['name'], $data['country']);
-        $repo = new UserRepository($connection);
-        $repo->create($user);
+        $this->userRepo->create($user);
         return ["message" => "User created"];
     }
 }

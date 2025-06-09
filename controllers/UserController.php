@@ -12,13 +12,22 @@ use Services\UserService;
  * - User data management
  */
 class UserController {
+
+
+    private UserService $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * Retrieve and return all users
      * 
      * @return void Outputs JSON encoded list of all users
      */
-    public static function getAll() {
-        $users = UserService::getAll();
+    public function getAll() {
+        $users = $this->userService->getAll();
         echo json_encode($users, JSON_PRETTY_PRINT);
     }
 
@@ -28,8 +37,8 @@ class UserController {
      * @param array $data User data including required fields
      * @return void Outputs JSON encoded response
      */
-    public static function create($data) {
-        $response = UserService::create($data);
+    public function create($data) {
+        $response = $this->userService->create($data);
         echo json_encode($response);
     }
 }

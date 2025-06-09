@@ -13,15 +13,22 @@ use Models\Product;
  * Provides CRUD operations for products and manages data validation.
  */
 class ProductService {
+
+    private $repo;
+
+    //dependency injection
+    public function __construct(ProductRepository $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * Retrieve all products from the database
      * 
      * @return array List of all products
      */
-    public static function getAll() {
-        global $connection;
-        $repo = new ProductRepository($connection);
-        return $repo->getAllProducts(); 
+    public function getAll() {
+        return $this->repo->getAllProducts(); 
     }
 
     /**
@@ -33,11 +40,10 @@ class ProductService {
      *                    - price: Product price (will be converted to float)
      * @return array Response message indicating success
      */
-    public static function create($data) {
+    public function create($data) {
         global $connection;
         $product = new Product(null, $data['name'], $data['description'], floatval($data['price']));
-        $repo = new ProductRepository($connection);
-        $repo->create($product);
+        $this->repo->create($product);
         return ["message" => "Product created"];
     }
 
@@ -48,13 +54,12 @@ class ProductService {
      * @param int $id ID of the product to update
      * @return array Response message indicating success or error
      */
-    public static function update($data, $id) {
+    public function update($data, $id) {
         global $connection;
         if (!$id) return ["error" => "Missing ID"];
 
         $product = new Product($id, $data['name'], $data['description'], floatval($data['price']));
-        $repo = new ProductRepository($connection);
-        $repo->update($product);
+        $this->repo->update($product);
         return ["message" => "Product updated"];
     }
 
@@ -64,12 +69,10 @@ class ProductService {
      * @param int $id ID of the product to delete
      * @return array Response message indicating success or error
      */
-    public static function delete($id) {
-        global $connection;
+    public function delete($id) {
         if (!$id) return ["error" => "Missing ID"];
 
-        $repo = new ProductRepository($connection);
-        $deleted = $repo->delete($id);
+        $deleted = $this->repo->delete($id);
         if ($deleted) {
             return ["message" => "Product deleted"];
         } else {

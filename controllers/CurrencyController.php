@@ -17,12 +17,22 @@ include_once(__DIR__ . '/../config/dbconfig.php');
  */
 class CurrencyController {
 
+    private CurrencyProcessor $currencyProcessor;
+    private CurrencyService $currencyService;
+
+    //D.I. using constructor
+    public function __construct(CurrencyProcessor $currencyProcessor, CurrencyService $currencyService)
+    {
+        $this->currencyProcessor = $currencyProcessor;
+        $this->currencyService = $currencyService;
+    }
+
     /**
      * Responsible for currency conversion using country.
      * 
      * @return void 
      */
-    public static function handleProductPage() {
+    public function handleProductPage() {
     Logger::info("CurrencyController::handleProductPage() called");
 
     if (!isset($_SESSION)) session_start();
@@ -61,7 +71,7 @@ class CurrencyController {
     global $connection;
 
     try {
-        $result = CurrencyProcessor::getConvertedProductList($connection, $country);
+        $result = $this->currencyProcessor->getConvertedProductList($country);
         Logger::info("Currency conversion successful for country: " . $country);
     } catch (\Exception $e) {
         Logger::error("Error during currency conversion: " . $e->getMessage());

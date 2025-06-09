@@ -16,6 +16,14 @@ use Utils\Logger;
  */
 class ProductController {
 
+    private ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
+
     /**
      * Display the product list view with currency conversion
      * 
@@ -27,12 +35,12 @@ class ProductController {
      * 
      * @return void
      */
-    public static function showProductList() {
+    public function showProductList() {
         Logger::info("ProductController::showProductList() called");
         session_start();
         
         // Fetch all products from the service
-        $products = ProductService::getAll();
+        $products = $this->productService->getAll();
         Logger::info("Fetched products: " . json_encode($products));
 
         // Get session data for currency conversion and cart
@@ -53,10 +61,10 @@ class ProductController {
      * 
      * @return void Outputs JSON encoded product list
      */
-    public static function getAll() {
+    public function getAll() {
         Logger::info("ProductController::getAll() called");
 
-        $products = ProductService::getAll();
+        $products = $this->productService->getAll();
         Logger::info("Products fetched: " . json_encode($products));
 
         echo json_encode($products, JSON_PRETTY_PRINT);
@@ -68,10 +76,10 @@ class ProductController {
      * @param array $data Product data including name, description, and price
      * @return void Outputs JSON encoded response
      */
-    public static function create($data) {
+    public function create($data) {
         Logger::info("ProductController::create() called with data: " . json_encode($data));
 
-        $response = ProductService::create($data);
+        $response = $this->productService->create($data);
         Logger::info("Product created with response: " . json_encode($response));
         
         echo json_encode($response);    
@@ -84,9 +92,9 @@ class ProductController {
      * @param int $id Product ID to update
      * @return void Outputs JSON encoded response
      */
-    public static function update($data, $id) {
+    public function update($data, $id) {
         Logger::info("ProductController::update() called for ID: $id with data: " . json_encode($data));
-        $response = ProductService::update($data, $id);
+        $response = $this->productService->update($data, $id);
         echo json_encode($response);
     }
 
@@ -96,9 +104,9 @@ class ProductController {
      * @param int $id Product ID to delete
      * @return void Outputs JSON encoded response
      */
-    public static function delete($id) {
+    public function delete($id) {
         Logger::info("ProductController::delete() called for ID: $id");
-        $response = ProductService::delete($id);
+        $response = $this->productService->delete($id);
         echo json_encode($response);
     }
 }

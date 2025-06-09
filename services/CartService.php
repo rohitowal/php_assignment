@@ -64,16 +64,5 @@ class CartService {
 
 
 
-//add comments          done
-//add log statements    done
-//.env file             done
-//use keyword           done
-//docs                  pending........
-/*
 
-overview
-setup
-data modelling , db info
-api documentation, endpoints, reqbody,resbody
-*/
 

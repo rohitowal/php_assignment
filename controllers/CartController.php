@@ -12,13 +12,26 @@ use Utils\Logger;
  * used to handell cart-related actions such as adding product to the cart. 
  */
 class CartController {
+
+
+    private $productRepository;
+    private $cartService;
+
+    
+    //Constructor with dependency injection
+    public function __construct(ProductRepository $productRepository, CartService $cartService) {
+        $this->productRepository = $productRepository;
+        $this->cartService = $cartService;
+    }
+
+
     /**
      * Handel add product to the cart
      * 
      * @param mysqli $connection Database connection object.
      * @return void
      */
-    public static function addToCart($connection) {
+    public function addToCart() {
         Logger::info("CartController::addToCart() called");
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,15 +42,14 @@ class CartController {
             $quantity = (int)($_POST['quantity'] ?? 0);
             Logger::info("Received product_id: $productId, quantity: $quantity");
 
-            $repo = new ProductRepository($connection);
-            $product = $repo->findById($productId);
+            $product = $this->productRepository->findById($productId);
 
             // Prepare response data
             $response = [];
 
             if ($product) {
                 Logger::info("Product found: " . $product['name']);
-                CartService::addProductToCart($product, $quantity);
+                $this->cartService->addProductToCart($product, $quantity);
                 Logger::info("Product added to cart: ID $productId, Quantity $quantity");
 
                 $response['status'] = 'success';

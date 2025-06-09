@@ -59,7 +59,7 @@ $countryCurrency = CurrencyService::$countryCurrency;
                 <td><?= $currencySymbol ?> <?= number_format($row['converted_price'], 2) ?></td>
                 <td>
                     <!-- Add to Cart Form -->
-                    <form method="post" action="index.php?action=add_to_cart">
+                    <form method="post" action="add-to-cart">
                         <input type="hidden" name="product_id" value="<?= $row['id'] ?>">
                         <input type="number" name="quantity" value="1" min="1">
                         <input type="submit" value="Add to Cart">
@@ -102,7 +102,7 @@ $countryCurrency = CurrencyService::$countryCurrency;
     </table>
     
     <!-- Order Confirmation Form -->
-    <form method="post" action="index.php?action=confirm_order" style="margin-top: 20px; text-align: right; margin-right: 127px">
+    <form method="post" action="confirm-order" style="margin-top: 20px; text-align: right; margin-right: 127px">
         <input type="submit" value="Confirm Order">
     </form>
 <?php endif; ?>

@@ -5,18 +5,31 @@ namespace Services;
 use Repositories\ProductRepository;
 use Services\CurrencyService;
 
-
 /**
  * Class CurrencyProcessor
  * 
  * Responsible for handling product price conversion based on country and currency.
  */
 class CurrencyProcessor {
-   
+
+    private ProductRepository $productRepository;
+    private CurrencyService $currencyService;
+
+    /**
+     * CurrencyProcessor constructor with dependency injection.
+     *
+     * @param ProductRepository $productRepository
+     * @param CurrencyService $currencyService
+     */
+    public function __construct(ProductRepository $productRepository, CurrencyService $currencyService)
+    {
+        $this->productRepository = $productRepository;
+        $this->currencyService = $currencyService;
+    }
+
     /**
      * Fetches the product list and converts product prices based on country.
      *
-     * @param mysqli $connection database connection object.
      * @param string $country The country name or code used to determine the target currency.
      *
      * @return array An associative array containing:
@@ -24,23 +37,20 @@ class CurrencyProcessor {
      *               - 'conversionRate': the currency conversion rate,
      *               - 'currencyInfo': the currency metadata (code and symbol).
      */
-    public static function getConvertedProductList($connection, $country) {
+    public function getConvertedProductList(string $country): array
+    {
+        // Get currency info and conversion rate
+        $currencyInfo = $this->currencyService->getCurrencyInfo($country);
+        $conversionRate = $this->currencyService->getExchangeRate('INR', $currencyInfo['code']);
 
-        //get currency info based on country
-        $currencyInfo = CurrencyService::getCurrencyInfo($country);
+        // Fetch products
+        $products = $this->productRepository->getAllProducts();
 
-        // Get the conversion rate from base currency (INR) to the target currency
-        $conversionRate = CurrencyService::getExchangeRate('INR', $currencyInfo['code']);
-
-        $repo = new ProductRepository($connection);
-        $products = $repo->getAllProducts();
-
-        // Loop through each product and calculate the converted price
+        // Convert prices
         foreach ($products as &$product) {
             $product['converted_price'] = $product['price'] * $conversionRate;
         }
 
-        // Return the final product list with converted prices and currency details.
         return [
             'products' => $products,
             'conversionRate' => $conversionRate,
